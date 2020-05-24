@@ -1,0 +1,11 @@
+Ewa:
+https://blog.prokulski.science/index.php/2017/09/14/analiza-tekstow-z-wiadomosci/ - czy da się to przenieść na pythona?
+
+Daria "To do" (25-31):
+- Aplikcja Flask(baza), szablon frontu
+- https://sigdelta.com/blog/text-analysis-in-pandas/
+
+Notes:
+W repo nie powinno być:
+- baz danych
+- plików .pyc 
