@@ -1,20 +1,21 @@
-
 import pandas as pd
 import numpy as np
 import os
 import urllib.request
 import glob
 import matplotlib.style
-import matplotlib as mpl
+import matplotlib.pyplot as plt
 from io import open
 import codecs
 from IPython.display import display
 
-
 # Just making the plots look better
-mpl.style.use('seaborn')
-mpl.rcParams['figure.figsize'] = (8,6)
-mpl.rcParams['font.size'] = 12
+plt.style.use('seaborn')
+plt.rcParams['figure.figsize'] = (8, 6)
+plt.rcParams['font.size'] = 12
+plt.xlabel("Word", labelpad=14)
+plt.ylabel("Number of Words", labelpad=14)
+plt.title("Text analysis in Pandas with TF-IDF", y=1.02)
 
 if not os.path.exists('data'):
      os.mkdir('data')
@@ -75,9 +76,7 @@ def pretty_plot_top_n(series, top_n=5, index_level=0):
 pretty_plot_top_n(counts['n_w'])
 
 word_sum = counts.groupby(level=0)\
-    .sum()\
-    .rename(columns={'n_w': 'n_d'})
-word_sum
+    .sum().rename(columns={'n_w': 'n_d'})
 
 tf = counts.join(word_sum)
 
@@ -85,6 +84,35 @@ tf['tf'] = tf.n_w/tf.n_d
 
 tf.head()
 
-display(pretty_plot_top_n(tf['tf']))
+# display(pretty_plot_top_n(tf['tf']))
+pretty_plot_top_n(tf['tf'])
 
-#pretty_plot_top_n(tf['tf']).savefig('plot.png')
+# get the size of set of unique elements in a series.
+c_d = words.book.nunique()
+
+# sorting values is only for the presentation and it is not needed for the further computations.
+idf = words.groupby('word')\
+    .book\
+    .nunique()\
+    .to_frame()\
+    .rename(columns={'book': 'i_d'})\
+    .sort_values('i_d')
+idf.head()
+
+idf['idf'] = np.log(c_d/idf.i_d.values)
+
+idf.head()
+
+tf_idf = tf.join(idf)
+tf_idf.head()
+tf_idf['tf_idf'] = tf_idf.tf * tf_idf.idf
+tf_idf.head()
+
+pretty_plot_top_n(tf_idf['tf_idf'])
+
+r = words[words.word.str.match('^s')]\
+    .groupby('word')\
+    .count()\
+    .rename(columns={'book': 'n'})\
+    .nlargest(10, 'n')
+r.plot.bar()
